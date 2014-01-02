@@ -6,8 +6,15 @@ Currently includes:
 * rolltables: Create and edit tables to generate random results from. Saves to a JSON file
 
 Planned:
-
 * rolltables
     * weighted tables
+    * table class with update method to avoid use of "global tables"
+* npcgenerator: Generate simple filler npcs, physical description, quirks
+
+Horizon:
+* rolltables
     * composite tables
-* npcgenerator: Generate simple filler npcs, physical description, quirks. Slaved to tables stored in rolltable perhaps?
+* npcgenerator
+    * hook up to tables
+* nicedice
+    * named roll macros
