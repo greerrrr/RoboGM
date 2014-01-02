@@ -8,6 +8,6 @@ Currently includes:
 Planned:
 
 * rolltables
-** weighted tables
-** composite tables
+    * weighted tables
+    * composite tables
 * npcgenerator: Generate simple filler npcs, physical description, quirks. Slaved to tables stored in rolltable perhaps?
