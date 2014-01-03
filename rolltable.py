@@ -77,3 +77,4 @@ def rolltable(bot, trigger):
 @willie.module.commands('reloadtables')
 def reloadtables(bot, trigger):
     load()
+    bot.say("Reloaded tables")
