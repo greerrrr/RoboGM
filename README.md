@@ -14,6 +14,8 @@ Planned:
 Horizon:
 * rolltables
     * composite tables
+    * bulk add
+    * change interface to be more usable
 * npcgenerator
     * hook up to tables
 * nicedice
