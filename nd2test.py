@@ -1,4 +1,4 @@
-from nicedice2 import *
+from nicedice import *
 roll = '2d5'
 complexroll = '2dF+3'
 wodroll = '4dW'
