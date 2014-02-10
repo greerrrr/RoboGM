@@ -44,4 +44,4 @@ def nada(bot, trigger):
       total = sum(rolls)+int(mod)
     else:
       total = sum(rolls)
-    bot.say("Total is" + str(total))
+      bot.say("Total is \x035,12" + str(total)+"\x03")
