@@ -16,16 +16,16 @@ codes = {"bold": "\x02",
          "underline2": "\x1f",
          "reverse": "\x16"}
 
-colors = {"white": "0",
-          "black": "1",
-          "dark_blue": "2",
-          "green": "3",
-          "red": "4",
-          "dark_red": "5",
-          "dark_violet": "6",
-          "orange": "7",
-          "yellow": "8",
-          "light_green": "9",
+colors = {"white": "00",
+          "black": "01",
+          "dark_blue": "02",
+          "green": "03",
+          "red": "04",
+          "dark_red": "05",
+          "dark_violet": "06",
+          "orange": "07",
+          "yellow": "08",
+          "light_green": "09",
           "cyan": "10",
           "light_cyan": "11",
           "blue": "12",
@@ -46,6 +46,7 @@ def color(text, fgcolor, bgcolor=None):
     else:
         output = codes['color']+colors[fgcolor]+text+codes['color']
     logging.debug("Returning colorized "+text+" as "+output)
+    return output
 
 logging.debug("8 green is "+str(color("8", "green")))
 
@@ -80,12 +81,9 @@ class Die:
             logging.debug("Fugde die")
             self.faces = "f"
             self.facelist = [-1, 0, 1]
-            self.strversion = {-1: "-",
-                                0: "0",
-                                1: "+"}
-            #self.strversion = {-1: color(u"\u2212", "red"  ), 
-            #                    0: color("0", "dark_grey" ), 
-            #                    1: color("+", "green")}
+            self.strversion = {-1: style(color(u"\u2212", "red"  ), "bold"), 
+                                0: color("0", "dark_grey" ), 
+                                1: style(color("+", "green"), "bold")}
 
             self.values = {-1: -1,
                             0:  0,
@@ -102,12 +100,9 @@ class Die:
                                5: "5",
                                6: "6",
                                7: "7",
-                               8: "8",
-                               9: "9",
-                               10: "10"}
-                               #8: color("8" , "green" ),
-                               #9: color("9" , "green" ),
-                               #10: color("10", "orange")}
+                               8:  style(color("8",  "green"), "bold"),
+                               9:  style(color("9",  "green"), "bold"),
+                               10: style(color("10", "green"), "bold")}
             self.values = {1 : 0,
                            2 : 0,
                            3 : 0,
@@ -147,7 +142,7 @@ class Die:
 
     @property
     def result_string(self):
-        return "!".join(self.strversion[result] for result in self.results)
+        return style("!", "bold").join(self.strversion[result] for result in self.results)
 
 class RollGroup:
     def __init__(self, rollexpression):
@@ -175,15 +170,11 @@ class RollGroup:
     @property
     def result_string(self):
         if self.rolled:
-            die = ', '.join(str(die.result_string) for die in self.dice)
+            die = ', '.join(die.result_string for die in self.dice)
             total = "Total: "+style(str(self.total), "bold") 
             return " ".join([die, total])
         else:
             return "Unrolled"
-
-
-
-logging.basicConfig(level=logging.DEBUG)
 
 @willie.module.rule(r'(.+\s)?((\d+)d(\d+|[FfWw])((\+|-)(\d+))?)(\s.+)?')
 def nada(bot, trigger):
