@@ -35,6 +35,17 @@ colors = {"white": "00",
 
 fate_synonyms = ['F',"f","fate","fudge","Fate", "FATE", "Fudge"]
 wod_synonyms = ["W", "w", "WW", "ww", "wod", "WoD"] 
+fate_ladder = {-2: "Terrible",
+               -1: "Poor",
+                0: "Mediocre",
+                1: "Average",
+                2: "Fair",
+                3: "Good",
+                4: "Great",
+                5: "Superb",
+                6: "Fantastic",
+                7: "Epic",
+                8: "Legendary"}
 
 def style(text, style):
     return codes[style]+text+codes[style]
@@ -148,14 +159,14 @@ class RollGroup:
     def __init__(self, rollexpression):
         parsed = parse_roll(rollexpression)
         quantity = parsed['quantity']
-        faces = parsed['faces']
+        self.faces = parsed['faces']
         self.modifier = parsed['signedmod']
         if self.modifier is None:
             self.modifier = 0
         self.dice = []
         self.rolled = False
         for die in range(1,quantity+1):
-            self.dice.append(Die(faces, die))
+            self.dice.append(Die(self.faces, die))
 
     def roll(self):
         for die in self.dice:
@@ -170,8 +181,15 @@ class RollGroup:
     @property
     def result_string(self):
         if self.rolled:
-            die = ', '.join(die.result_string for die in self.dice)
-            total = "Total: "+style(str(self.total), "bold") 
+            if self.faces in fate_synonyms:
+                die = ', '.join(die.result_string for die in self.dice)
+                if self.total in fate_ladder:
+                    total = style(fate_ladder[self.total], "bold")
+                else:
+                    total = "Total: "+style(str(self.total), "bold")
+            else:
+                die = ', '.join(die.result_string for die in self.dice)
+                total = "Total: "+style(str(self.total), "bold") 
             return " ".join([die, total])
         else:
             return "Unrolled"
