@@ -1,9 +1,50 @@
-import random, re, logging, ircformat
+"""
+nicedice.py - a custom dice module
+by spr-k3737
+Any use of this code is unlicensed
+http://willie.dftba.net
+"""
+import willie, random, re, logging
 
 logging.basicConfig(level=logging.DEBUG)
+codes = {"bold": "\x02",
+         "color": "\x03",
+         "italic": "\x09",
+         "strikethrough": "\x13",
+         "reset": "\x0f",
+         "underline": "\x15",
+         "underline2": "\x1f",
+         "reverse": "\x16"}
+
+colors = {"white": "0",
+          "black": "1",
+          "dark_blue": "2",
+          "green": "3",
+          "red": "4",
+          "dark_red": "5",
+          "dark_violet": "6",
+          "orange": "7",
+          "yellow": "8",
+          "light_green": "9",
+          "cyan": "10",
+          "light_cyan": "11",
+          "blue": "12",
+          "violet": "13",
+          "dark_grey": "14",
+          "light_grey": "15"}
 
 fate_synonyms = ['F',"f","fate","fudge","Fate", "FATE", "Fudge"]
 wod_synonyms = ["W", "w", "WW", "ww", "wod", "WoD"] 
+
+def style(text, style):
+	return codes[style]+text+codes[style]
+
+def color(text, fgcolor, bgcolor=None):
+	if fgcolor in colors and bgcolor in colors:
+		colorstring = colors[fgcolor]+","+colors[bgcolor]
+		return codes['color']+colorstring+text+codes['color']
+	else:
+		return codes['color']+colors[fgcolor]+text+codes['color']
 
 def parse_roll(roll_expr):
         dienames = '|'.join(fate_synonyms+wod_synonyms)
@@ -34,9 +75,9 @@ class Die:
             logging.debug("recognized F")
             self.faces = "f"
             self.facelist = [-1, 0, 1]
-            self.strversion = {-1: ircformat.color("−", "red"  ), 
-                                0: ircformat.color("0", "dark_grey" ), 
-                                1: ircformat.color("+", "green")}
+            self.strversion = {-1: color(u"\u2212", "red"  ), 
+                                0: color("0", "dark_grey" ), 
+                                1: color("+", "green")}
 
             self.values = {-1: -1,
                             0:  0,
@@ -52,9 +93,9 @@ class Die:
                                5 : "5",
                                6 : "6",
                                7 : "7",
-                               8 : ircformat.color("8" , "green" ),
-                               9 : ircformat.color("9" , "green" ),
-                               10: ircformat.color("10", "orange")}
+                               8 : color("8" , "green" ),
+                               9 : color("9" , "green" ),
+                               10: color("10", "orange")}
             self.values = {1 : 0,
                            2 : 0,
                            3 : 0,
@@ -118,7 +159,29 @@ class RollGroup:
     def result_string(self):
         if self.rolled:
             die = ', '.join(str(die.result_string) for die in self.dice)
-            total = "Total: "+ircformat.style(str(self.total), "bold") 
+            total = "Total: "+style(str(self.total), "bold") 
             return die+total
         else:
             return "Unrolled"
+
+
+
+logging.basicConfig(level=logging.DEBUG)
+
+@willie.module.rule(r'(.+\s)?((\d+)d(\d+|F)((\+|-)(\d+))?)(\s.+)?')
+def nada(bot, trigger):
+    match = re.search(r'(.+\s)?((\d+)d(\d+|F)((\+|-)(\d+))?)(\s.+)?', trigger)
+    
+    whole     = match.group(0)
+    prefix    = match.group(1)
+    diceexpr  = match.group(2)
+    quantity  = match.group(3)
+    diesize   = match.group(4)
+    mod       = match.group(5)
+    sign      = match.group(6)
+    magnitude = match.group(7)
+    suffix    = match.group(8)
+
+    r = RollGroup(diceexpr)
+    r.roll()
+    bot.say(r.result_string)
