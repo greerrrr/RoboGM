@@ -129,7 +129,7 @@ class Die:
     def roll(self):
         result = random.choice(self.facelist)
         result_arr = [result]
-        if self.faces == "w" and result in [8, 9, 10]:
+        if self.faces == "w" and result in [10]:
             result_arr+=self.roll()
         self.results = result_arr
         logging.debug("result = "+str(result_arr))
