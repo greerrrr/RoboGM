@@ -37,14 +37,17 @@ fate_synonyms = ['F',"f","fate","fudge","Fate", "FATE", "Fudge"]
 wod_synonyms = ["W", "w", "WW", "ww", "wod", "WoD"] 
 
 def style(text, style):
-	return codes[style]+text+codes[style]
+    return codes[style]+text+codes[style]
 
 def color(text, fgcolor, bgcolor=None):
-	if fgcolor in colors and bgcolor in colors:
-		colorstring = colors[fgcolor]+","+colors[bgcolor]
-		return codes['color']+colorstring+text+codes['color']
-	else:
-		return codes['color']+colors[fgcolor]+text+codes['color']
+    if fgcolor in colors and bgcolor in colors:
+        colorstring = colors[fgcolor]+","+colors[bgcolor]
+        output = codes['color']+colorstring+text+codes['color']
+    else:
+        output = codes['color']+colors[fgcolor]+text+codes['color']
+    logging.debug("Returning colorized "+text+" as "+output)
+
+logging.debug("8 green is "+str(color("8", "green")))
 
 def parse_roll(roll_expr):
         dienames = '|'.join(fate_synonyms+wod_synonyms)
@@ -68,34 +71,43 @@ class Die:
     def __init__(self, faces, number):
         self.faces = faces
         self.number = number
-        logging.debug("faces = "+faces)
+        logging.debug("Creating die #"+str(self.number)+" with faces ="
+                      +str(faces))
         #result is a list, to allow for standard coding and chains for WW die
         self.results = []
+        self.strversion = {}
         if faces in fate_synonyms:
-            logging.debug("recognized F")
+            logging.debug("Fugde die")
             self.faces = "f"
             self.facelist = [-1, 0, 1]
-            self.strversion = {-1: color(u"\u2212", "red"  ), 
-                                0: color("0", "dark_grey" ), 
-                                1: color("+", "green")}
+            self.strversion = {-1: "-",
+                                0: "0",
+                                1: "+"}
+            #self.strversion = {-1: color(u"\u2212", "red"  ), 
+            #                    0: color("0", "dark_grey" ), 
+            #                    1: color("+", "green")}
 
             self.values = {-1: -1,
                             0:  0,
                             1:  1}
         elif faces in wod_synonyms:
+            logging.debug("White wolf die")
             self.faces = "w"
             self.facelist = range(1,11)
             self.successes = 0
-            self.strversion = {1 : "1",
-                               2 : "2",
-                               3 : "3",
-                               4 : "4",
-                               5 : "5",
-                               6 : "6",
-                               7 : "7",
-                               8 : color("8" , "green" ),
-                               9 : color("9" , "green" ),
-                               10: color("10", "orange")}
+            self.strversion = {1: "1",
+                               2: "2",
+                               3: "3",
+                               4: "4",
+                               5: "5",
+                               6: "6",
+                               7: "7",
+                               8: "8",
+                               9: "9",
+                               10: "10"}
+                               #8: color("8" , "green" ),
+                               #9: color("9" , "green" ),
+                               #10: color("10", "orange")}
             self.values = {1 : 0,
                            2 : 0,
                            3 : 0,
@@ -107,9 +119,14 @@ class Die:
                            9 : 1,
                            10: 1}
         else:
+            logging.debug("Normal die")
             self.facelist = range(1,int(faces)+1)
             self.strversion = {x: str(x) for x in range (1, int(faces)+1)}
             self.values = {x: x for x in range (1, int(faces)+1)}
+
+        for key in self.strversion:
+            logging.debug(str(key)+"Assigned to:")
+            logging.debug(self.strversion[key])
 
     def __str__(self):
         return "d"+faces+": [ "+", ".join(self.history)+" ]"
@@ -160,7 +177,7 @@ class RollGroup:
         if self.rolled:
             die = ', '.join(str(die.result_string) for die in self.dice)
             total = "Total: "+style(str(self.total), "bold") 
-            return die+total
+            return " ".join([die, total])
         else:
             return "Unrolled"
 
@@ -168,9 +185,10 @@ class RollGroup:
 
 logging.basicConfig(level=logging.DEBUG)
 
-@willie.module.rule(r'(.+\s)?((\d+)d(\d+|F)((\+|-)(\d+))?)(\s.+)?')
+@willie.module.rule(r'(.+\s)?((\d+)d(\d+|[FfWw])((\+|-)(\d+))?)(\s.+)?')
 def nada(bot, trigger):
-    match = re.search(r'(.+\s)?((\d+)d(\d+|F)((\+|-)(\d+))?)(\s.+)?', trigger)
+    logging.debug("Triggered on "+trigger)
+    match = re.search(r'(.+\s)?((\d+)d(\d+|[FfWw])((\+|-)(\d+))?)(\s.+)?', trigger)
     
     whole     = match.group(0)
     prefix    = match.group(1)
