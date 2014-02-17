@@ -19,12 +19,20 @@ Horizon:
 * linked tables
 
 ###sockpuppet
-PM RoboGM with ```.puppet-channel``` to set an output channel, then all text of the form ```>Message for channel``` to RoboGM will be sent through it.
+Speak through RoboGM to a channel
+####Usage
+* ```.puppet-channel #channel``` output messages to #channel
+* ```>Message``` Say Message in #channel
 
 ###deck
 Create, name, and draw from decks of cards. Simulates a depleting deck.
 * Normal playing cards
 * Major Arcana
+* Remembers last used deck
+
+####Usage
+* .newdeck deck_type [deck_name]
+* .draw [deck_name]
 
 Implementing:
 * shuffle
