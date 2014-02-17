@@ -1,5 +1,5 @@
 """
-nicedice.py - a custom dice module
+deck.py - a custom dice module
 by spr-k3737
 Any use of this code is unlicensed
 http://willie.dftba.net
@@ -73,6 +73,7 @@ class Card:
         self.value = value
         self.orientation = orientation
         self.deck_type = deck_type
+        logging.debug("Created card with value "+self.value)
 
     def flip(self):
         if self.orientation == "Unreversed":
@@ -84,9 +85,11 @@ class Card:
         self.orientation = random.choice(["Reversed", "Unreversed"])
 
     @property
-    def value(self):
+    def print_value(self):
+        logging.debug("Value is "+self.value)
+        logging.debug("Orientation is "+self.orientation)
         if self.deck_type == "tarot" and self.orientation == "Reversed":
-            string = "Reversed" + self.value
+            string = "Reversed " + self.value
             return string
         else:
             return self.value
@@ -133,13 +136,25 @@ def newdeck(bot, trigger):
     bot.memory['decks'] = {}
     bot.memory['decks'][deck_name] = new_deck
     bot.memory['lastdeck'] = deck_name
+    bot.memory['decks'][deck_name].shuffle()
 
 @willie.module.commands('draw')
-def drawcard(bot, trigger):
+def draw_card(bot, trigger):
     if trigger.group(2) == None:
         deck_name = bot.memory['lastdeck']
     else:
         deck_name = trigger.group(2)
         bot.memory['lastdeck'] = deck_name
     logging.debug("Drawing card from deck "+deck_name)
-    bot.say(bot.memory['decks'][deck_name].draw().value)
+    bot.say(bot.memory['decks'][deck_name].draw().print_value)
+
+@willie.module.commands('shuffle')
+def shuffle_deck(bot, trigger):
+    if trigger.group(2) == None:
+        deck_name = bot.memory['lastdeck']
+    else:
+        deck_name = trigger.group(2)
+        bot.memory['lastdeck'] = deck_name
+    logging.debug("shuffling deck"+deck_name)
+    bot.say("shuffling deck"+deck_name)
+    bot.memory['decks'][deck_name].shuffle()
