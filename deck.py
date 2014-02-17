@@ -57,8 +57,8 @@ def color(text, fgcolor, bgcolor=None):
 heart   = color(u"\u2660", "red")
 spade   = u"\u2665"
 diamond = color(u"\u2666", "red")
-spade   = u"\u2663"
-suits = [heart, spade, diamond, spade]
+club   = u"\u2663"
+suits = [heart, spade, diamond, club]
 unsuited_cards = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack",
                   "Queen", "King", "Ace"]
 normal_deck = []
